@@ -1,30 +1,14 @@
-// // src/pages/Home.tsx
-// import React, { useEffect, useState } from "react";
-// // import DataTable from "./TableData";
-// // import { fetchUsers } from "../api/fetchData";
-// // import { User } from "../components/TableData";
-// const Home: React.FC = () => {
-//   const [users, setUsers] = useState<User[]>([]);
-//   const [loading, setLoading] = useState(true);
+// src/pages/Home.tsx
+import React from "react";
+import CrudTable from "./CrudT1able";
 
-//   useEffect(() => {
-//     fetchUsers()
-//       .then((data: React.SetStateAction<User[]>) => {
-//         setUsers(data);
-//         setLoading(false);
-//       })
-//       .catch((error: any) => {
-//         console.error("エラー:", error);
-//         setLoading(false);
-//       });
-//   }, []);
+const Home: React.FC = () => {
+  return (
+    <div>
+      <h2>ユーザー管理</h2>
+      <CrudTable />
+    </div>
+  );
+};
 
-//   return (
-//     <div>
-//       <h2>ユーザー一覧</h2>
-//       {loading ? <p>データを読み込み中...</p> : <DataTable />}
-//     </div>
-//   );
-// };
-
-// export default Home;
+export default Home;

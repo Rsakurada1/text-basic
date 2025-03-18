@@ -2,7 +2,7 @@
 import React from "react";
 import { MaterialReactTable } from "material-react-table";
 import { Box } from "@mui/material";
-import { columns } from "./TableColums"
+import { columns } from "./TableColumns"
 import { mockData } from "./TableData";
 
 const DataTable: React.FC = () => {

@@ -6,21 +6,18 @@ export const columns: MRT_ColumnDef<User>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    size: 50, // カラム幅
+    enableEditing: false, // IDは編集不可
   },
   {
     accessorKey: "name",
     header: "名前",
-    size: 150,
   },
   {
     accessorKey: "age",
     header: "年齢",
-    size: 100,
   },
   {
     accessorKey: "city",
     header: "都市",
-    size: 120,
   },
 ];

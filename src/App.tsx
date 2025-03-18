@@ -1,17 +1,23 @@
-import React from 'react';
-import './App.css';
+// src/App.tsx
+import React from "react";
+import Home from "./Home";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
-function App() {
+const theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: { main: "#1976d2" },
+  },
+});
 
-  const list = ['Patty', 'Rolley', 'Bobby'];
-
+const App: React.FC = () => {
   return (
-  
-  <>
-          
-  </>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Home />
+    </ThemeProvider>
   );
-
-  }  
+};
 
 export default App;
