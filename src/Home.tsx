@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 import React from "react";
-import CrudTable from "./CrudT1able";
+import CrudTable from "./CrudTable";
 
 const Home: React.FC = () => {
   return (
