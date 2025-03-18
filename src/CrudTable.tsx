@@ -3,42 +3,68 @@ import {
   MaterialReactTable,
   MRT_ColumnDef,
   MRT_Row,
-  MRT_TableInstance,
 } from "material-react-table";
-import { Box, Button } from "@mui/material";
-import { User, mockData } from "./TableData";
+import { Box, Button, IconButton } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { User } from "./TableData";
 
-const columns: MRT_ColumnDef<User>[] = [
-  { accessorKey: "id", header: "ID", enableEditing: false },
-  { accessorKey: "name", header: "名前" },
-  { accessorKey: "age", header: "年齢" },
-  { accessorKey: "city", header: "都市" },
-];
+const LOCAL_STORAGE_KEY = "crud-table-data";
+
+// `localStorage` からデータを取得する関数
+const getInitialData = (): User[] => {
+  const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return storedData ? JSON.parse(storedData) : [];
+};
 
 const CrudTable: React.FC = () => {
-  const [data, setData] = useState<User[]>(mockData);
-  const [editingRowId, setEditingRowId] = useState<number | null>(null);
+  const [data, setData] = useState<User[]>(getInitialData()); // 初期値を `localStorage` から取得
 
-  // 新しい空のレコードを追加し、編集モードにする
+  // データを `localStorage` に保存
+  const saveToLocalStorage = (updatedData: User[]) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedData));
+  };
+
+  // 新しい空のレコードを追加
   const handleAddEmptyRow = () => {
-    const newId = data.length + 1;
-    const newRow = { id: newId, name: "", age: 0, city: "" };
-    setData([...data, newRow]);
-    setEditingRowId(newId); // 追加した行の編集モードを有効にする
+    const newId = data.length > 0 ? Math.max(...data.map((d) => d.id)) + 1 : 1;
+    const newRow: User = { id: newId, name: "", age: 0, city: "" }; // 空のデータを追加
+    const newData = [...data, newRow];
+    setData(newData);
+    saveToLocalStorage(newData); // ✅ 追加時にキャッシュ
   };
 
-  // レコードを編集したときにデータを更新する
-  const handleUpdateUser = async ({ values, row }: { values: User; row: MRT_Row<User> }) => {
-    setData((prevData) =>
-      prevData.map((item) => (item.id === row.original.id ? { ...item, ...values } : item))
+  // **行を編集して保存したときに `localStorage` に保存**
+  const handleSaveRow = ({
+    values,
+    row,
+    exitEditingMode,
+  }: {
+    values: User;
+    row: MRT_Row<User>;
+    exitEditingMode: () => void;
+  }) => {
+    const updatedData = data.map((item) =>
+      item.id === row.original.id ? { ...item, ...values } : item
     );
-    setEditingRowId(null); // 編集が終わったら編集モードを解除
+    setData(updatedData);
+    saveToLocalStorage(updatedData); // ✅ `localStorage` に保存
+    exitEditingMode(); // ✅ 編集モードを終了
   };
 
-  // レコードを削除する
+  // レコードを削除
   const handleDeleteUser = (row: MRT_Row<User>) => {
-    setData(data.filter((item) => item.id !== row.original.id));
+    const updatedData = data.filter((item) => item.id !== row.original.id);
+    setData(updatedData);
+    saveToLocalStorage(updatedData);
   };
+
+  const columns: MRT_ColumnDef<User>[] = [
+    { accessorKey: "id", header: "ID", enableEditing: false },
+    { accessorKey: "name", header: "名前" },
+    { accessorKey: "age", header: "年齢" },
+    { accessorKey: "city", header: "都市" },
+  ];
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -53,19 +79,24 @@ const CrudTable: React.FC = () => {
         data={data}
         enableEditing
         editDisplayMode="table"
-        onEditingRowSave={handleUpdateUser}
         enableRowActions
-        getRowId={(row) => row.id.toString()} // 各行の識別に `id` を使用
-        muiTableBodyRowProps={({ row }) => ({
-          sx: {
-            backgroundColor: row.original.id === editingRowId ? "rgba(0, 0, 255, 0.1)" : "inherit", // 編集モードの行を強調表示
-          },
-          onClick: () => setEditingRowId(row.original.id), // クリックで編集モードを有効化
-        })}
+        onEditingRowSave={handleSaveRow} // ✅ `onEditingRowSave` を適用
         renderRowActions={({ row }) => (
-          <Button color="error" onClick={() => handleDeleteUser(row)}>
-            削除
-          </Button>
+          <>
+            {/* 保存ボタン */}
+            <IconButton
+              color="primary"
+              onClick={() =>
+                handleSaveRow({ values: row.original, row, exitEditingMode: () => {} })
+              }
+            >
+              <SaveIcon />
+            </IconButton>
+            {/* 削除ボタン */}
+            <IconButton color="error" onClick={() => handleDeleteUser(row)}>
+              <DeleteIcon />
+            </IconButton>
+          </>
         )}
       />
     </Box>
